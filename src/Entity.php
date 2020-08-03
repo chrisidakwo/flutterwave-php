@@ -3,6 +3,7 @@
 namespace ChrisIdakwo\Flutterwave;
 
 use ChrisIdakwo\Flutterwave\Support\Str;
+use JsonException;
 use ReflectionClass;
 use ReflectionException;
 
@@ -26,5 +27,13 @@ class Entity {
 
 			$this->{$classProperty->getName()} = $value;
 		}
+	}
+
+	/**
+	 * @return array
+	 * @throws JsonException
+	 */
+	public function toArray(): array {
+		return json_decode(json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 	}
 }

@@ -8,58 +8,58 @@ use JsonException;
 use ReflectionException;
 
 class VerifyTransactionTest extends TestCase {
-	/**
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function testInvalidTransactionKey(): void {
-		$this->setExpectedException(ClientException::class);
+    /**
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function testInvalidTransactionKey(): void {
+        $this->setExpectedException(ClientException::class);
 
-		$response = $this->rave->verifyTransaction('1235665');
+        $response = $this->rave->verifyTransaction('1235665');
 
-		$isArray = is_array($response);
-		self::assertTrue($isArray);
+        $isArray = is_array($response);
+        self::assertTrue($isArray);
 
-		self::assertSame($response['status'], 'error');
-		self::assertNull($response['data']);
-	}
+        self::assertSame($response['status'], 'error');
+        self::assertNull($response['data']);
+    }
 
-	/**
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function testTransactionEntityClassIsWellFormed(): void {
-		$transaction = $this->rave->verifyTransaction('1445841');
+    /**
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function testTransactionEntityClassIsWellFormed(): void {
+        $transaction = $this->rave->verifyTransaction('1445841');
 
-		self::assertNotNull($transaction->id);
-		self::assertNotNull($transaction->amount);
-		self::assertNotNull($transaction->chargedAmount);
-		self::assertNotNull($transaction->amountSettled);
+        self::assertNotNull($transaction->id);
+        self::assertNotNull($transaction->amount);
+        self::assertNotNull($transaction->chargedAmount);
+        self::assertNotNull($transaction->amountSettled);
 
-		$isObject = is_object($transaction->customer);
-		self::assertTrue($isObject);
+        $isObject = is_object($transaction->customer);
+        self::assertTrue($isObject);
 
-		self::assertObjectHasAttribute('name', $transaction->customer);
-		self::assertObjectHasAttribute('email', $transaction->customer);
-		self::assertObjectHasAttribute('phone_number', $transaction->customer);
+        self::assertObjectHasAttribute('name', $transaction->customer);
+        self::assertObjectHasAttribute('email', $transaction->customer);
+        self::assertObjectHasAttribute('phone_number', $transaction->customer);
 
-		if ($transaction->paymentType === 'account') {
-			self::assertNotNull($transaction->account);
+        if ($transaction->paymentType === 'account') {
+            self::assertNotNull($transaction->account);
 
-			self::assertNull($transaction->card);
+            self::assertNull($transaction->card);
 
-			$isObject = is_object($transaction->account);
-			self::assertTrue($isObject);
-		}
+            $isObject = is_object($transaction->account);
+            self::assertTrue($isObject);
+        }
 
-		if ($transaction->paymentType === 'card') {
-			self::assertNotNull($transaction->card);
+        if ($transaction->paymentType === 'card') {
+            self::assertNotNull($transaction->card);
 
-			self::assertNull($transaction->account);
+            self::assertNull($transaction->account);
 
-			$isObject = is_object($transaction->card);
-			self::assertTrue($isObject);
-		}
-	}
+            $isObject = is_object($transaction->card);
+            self::assertTrue($isObject);
+        }
+    }
 }

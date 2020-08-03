@@ -46,35 +46,35 @@ class StandardPaymentTest extends TestCase {
 
         $this->setExpectedException(InvalidRequestDataException::class);
 
-	    $response = $this->rave->standardPayment($requestBody);
+        $response = $this->rave->standardPayment($requestBody);
     }
 
     public function testPaymentLinkIsReturned() {
         $requestBody = [
-	        'tx_ref' => 'CICXRDAR-' . random_int(6, 12),
-	        'amount' => 5000,
-	        'currency' => 'NGN',
-	        'payment_options' => 'card,account',
-	        'redirect_url' => 'http://localhost:9700/payment/callback',
-	        'customer' => [
-		        'name' => 'John Doe',
-		        'phonenumber' => '08044000000',
-		        'email' => 'johndoe@email.com'
-	        ],
-	        'customizations' => [
-		        'title' => 'Test Limited',
-		        'description' => 'Lorem ipsum dolor sit amet',
-		        'logo' => 'https=>//d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/052016/untitled-1_183.png'
-	        ]
+            'tx_ref' => 'CICXRDAR-' . random_int(6, 12),
+            'amount' => 5000,
+            'currency' => 'NGN',
+            'payment_options' => 'card,account',
+            'redirect_url' => 'http://localhost:9700/payment/callback',
+            'customer' => [
+                'name' => 'John Doe',
+                'phonenumber' => '08044000000',
+                'email' => 'johndoe@email.com'
+            ],
+            'customizations' => [
+                'title' => 'Test Limited',
+                'description' => 'Lorem ipsum dolor sit amet',
+                'logo' => 'https=>//d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/052016/untitled-1_183.png'
+            ]
         ];
 
-	    $response = $this->rave->standardPayment($requestBody);
+        $response = $this->rave->standardPayment($requestBody);
 
-	    self::assertTrue(is_array($response));
+        self::assertTrue(is_array($response));
 
-//	    var_dump('PAYMENT_LINK', $response['data']['link']);
-//	    die();
+        //	    var_dump('PAYMENT_LINK', $response['data']['link']);
+        //	    die();
 
-	    self::assertArrayHasKey('data', $response);
+        self::assertArrayHasKey('data', $response);
     }
 }

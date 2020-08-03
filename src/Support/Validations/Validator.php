@@ -5,29 +5,29 @@ namespace ChrisIdakwo\Flutterwave\Support\Validations;
 use Respect\Validation\Exceptions\Exception;
 
 abstract class Validator implements IValidator {
-	public array $data;
+    public array $data;
 
-	private string $errors;
+    private string $errors;
 
-	private bool $valid;
+    private bool $valid;
 
-	public \Respect\Validation\Validator $validator;
+    public \Respect\Validation\Validator $validator;
 
-	/**
-	 * Validator constructor.
-	 *
-	 * @param array $data
-	 */
-	public function __construct(array $data) {
-		$this->data = $data;
-		$this->errors = '';
-		$this->valid = false;
-		$this->validator = \Respect\Validation\Validator::create();
-	}
+    /**
+     * Validator constructor.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data) {
+        $this->data = $data;
+        $this->errors = '';
+        $this->valid = false;
+        $this->validator = \Respect\Validation\Validator::create();
+    }
 
-	/**
-	 * @return self
-	 */
+    /**
+     * @return self
+     */
     public function validate(): self {
         try {
             $this->buildValidator()->assert($this->data);

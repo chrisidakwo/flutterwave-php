@@ -7,17 +7,17 @@ use JsonException;
 use ReflectionException;
 
 class TransactionRefundTest extends TestCase {
-	/**
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function testRefundIsSuccessful(): void {
-		$transactionId = getenv('ACCOUNT_TRANSACTION');
-		$data = ['amount' => 100];
+    /**
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function testRefundIsSuccessful(): void {
+        $transactionId = getenv('ACCOUNT_TRANSACTION');
+        $data = ['amount' => 100];
 
-		$refund = $this->rave->refundTransaction($transactionId, $data);
+        $refund = $this->rave->refundTransaction($transactionId, $data);
 
-		self::assertEquals($refund->amountRefunded, $data['amount']);
-	}
+        self::assertEquals($refund->amountRefunded, $data['amount']);
+    }
 }

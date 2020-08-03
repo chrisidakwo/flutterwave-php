@@ -7,13 +7,13 @@ use ChrisIdakwo\Flutterwave\Http\Request\Contracts\HttpPostRequest;
 use GuzzleHttp\Client as GuzzleHttpClient;
 
 class AnonymousHttpClient implements HttpClient {
-	private GuzzleHttpClient $http;
+    private GuzzleHttpClient $http;
 
-	public function __construct(GuzzleHttpClient $httpClient) {
-		$this->http = $httpClient;
-	}
+    public function __construct(GuzzleHttpClient $httpClient) {
+        $this->http = $httpClient;
+    }
 
-	/**
+    /**
      * @inheritDoc
      */
     public function post(HttpPostRequest $request): string {

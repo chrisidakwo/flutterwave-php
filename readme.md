@@ -12,8 +12,10 @@ composer require chrisidakwo/flutterwave-php
 
 ## Usage
 ```php
-use ChrisIdakwo\Flutterwave\Rave;$secretToken = 'secretToken';
-$rave = new Rave($secretToken);
+use ChrisIdakwo\Flutterwave\Rave;
+$secretKey = 'FLW-SECRET-KEY';
+$baseUrl = 'https://baseurl.com/v3';
+$rave = new Rave($secretKey, $baseUrl);
 
 // To generate a payment link
 $requestData = []; // See https://developer.flutterwave.com/docs/flutterwave-standard

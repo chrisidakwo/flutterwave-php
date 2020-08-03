@@ -3,7 +3,6 @@
 namespace ChrisIdakwo\Flutterwave\Tests;
 
 use ChrisIdakwo\Flutterwave\Exceptions\InvalidRequestDataException;
-use ChrisIdakwo\Flutterwave\Rave;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentRequest;
 
 class StandardPaymentTest extends TestCase {
@@ -18,7 +17,7 @@ class StandardPaymentTest extends TestCase {
             ]
         ];
 
-        $standardPayment = (new StandardPaymentRequest())->setBody($requestBody);
+        $standardPayment = (new StandardPaymentRequest(''))->setBody($requestBody);
 
         self::assertNotEmpty($standardPayment->getBody());
 
@@ -47,7 +46,7 @@ class StandardPaymentTest extends TestCase {
 
         $this->setExpectedException(InvalidRequestDataException::class);
 
-        $response = Rave::make()->standardPayment($requestBody);
+	    $response = $this->rave->standardPayment($requestBody);
     }
 
     public function testPaymentLinkIsReturned() {
@@ -62,17 +61,17 @@ class StandardPaymentTest extends TestCase {
                 'phonenumber' => '08044000000',
                 'email' => 'johndoe@email.com'
             ],
-            'customizations' => [
-                'title' => 'Test Limited',
-                'description' => 'Lorem ipsum dolor sit amet',
-                'logo' => 'https=>//d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/052016/untitled-1_183.png'
-            ]
+	        'customizations' => [
+		        'title' => 'Test Limited',
+		        'description' => 'Lorem ipsum dolor sit amet',
+		        'logo' => 'https=>//d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/052016/untitled-1_183.png'
+	        ]
         ];
 
-        $response = Rave::make()->standardPayment($requestBody);
+	    $response = $this->rave->standardPayment($requestBody);
 
-        self::assertArrayHasKey('data', $response);
+	    self::assertTrue(is_array($response));
 
-        self::assertTrue(is_array($response));
+	    self::assertArrayHasKey('data', $response);
     }
 }

@@ -2,12 +2,19 @@
 
 namespace ChrisIdakwo\Flutterwave\Http\Response;
 
-use JsonException;
+use ChrisIdakwo\Flutterwave\Http\Response\Contracts\HttpResponse as HttpResponseContract;
 
-interface HttpResponse {
-    /**
-     * @return array
-     * @throws JsonException
-     */
-    public function getResponse(): array;
+class HttpResponse implements HttpResponseContract {
+	private string $response;
+
+	public function __construct(string $response) {
+		$this->response = $response;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getResponse(): array {
+		return (array)json_decode($this->response, true, 512, JSON_THROW_ON_ERROR);
+	}
 }

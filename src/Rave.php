@@ -8,45 +8,36 @@ use ChrisIdakwo\Flutterwave\Http\Client\AnonymousHttpClient;
 use ChrisIdakwo\Flutterwave\Http\Client\AuthenticatedHttpClient;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentRequest;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentResponse;
-use ChrisIdakwo\Flutterwave\Support\Environment;
-use ChrisIdakwo\Flutterwave\Validations\StandardPaymentValidator;
+use ChrisIdakwo\Flutterwave\Support\Validations\StandardPaymentValidator;
+use ChrisIdakwo\Flutterwave\Transaction\Transaction;
+use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionRequest;
+use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
+use ReflectionException;
 
 class Rave {
-    public const LIVE_BASE_URL = 'https://api.ravepay.co';
-    public const STAGING_BASE_URL = 'https://ravesandboxapi.flutterwave.com';
+	public string $baseUrl;
+	private AuthenticatedHttpClient $authenticatedHttpClient;
 
-    private AnonymousHttpClient $anonymousHttpClient;
-    private AuthenticatedHttpClient $authenticatedHttpClient;
+	/**
+	 * Rave constructor.
+	 *
+	 * @param string $secretKey
+	 * @param string $baseUrl
+	 * @throws InvalidSecretKey
+	 */
+	public function __construct(string $secretKey, string $baseUrl) {
+		if (empty($secretKey)) {
+			throw new InvalidSecretKey('The secret key cannot be an empty string!');
+		}
 
-    /**
-     * Rave constructor.
-     *
-     * @param string $secretKey
-     * @throws InvalidSecretKey
-     */
-    public function __construct(string $secretKey) {
-        if (empty($secretKey)) {
-            throw new InvalidSecretKey('The secret key cannot be an empty string!');
-        }
+		$anonymousHttpClient = new AnonymousHttpClient(new Client);
+		$this->authenticatedHttpClient = new AuthenticatedHttpClient($anonymousHttpClient, $secretKey);
 
-        $this->anonymousHttpClient = new AnonymousHttpClient(new Client);
-        $this->authenticatedHttpClient = new AuthenticatedHttpClient($this->anonymousHttpClient, $secretKey);
-    }
-
-    /**
-     * Static constructor. Convenient method primarily for testing.
-     *
-     * @return static
-     * @throws InvalidSecretKey
-     */
-    public static function make(): self {
-        $secretToken = (new Environment)->getSecretKey();
-
-        return new static($secretToken);
-    }
+		$this->baseUrl = $baseUrl;
+	}
 
     /**
      * @param array $data
@@ -61,12 +52,29 @@ class Rave {
             throw new InvalidRequestDataException($validator->getErrors());
         }
 
-        $standardPaymentRequest = (new StandardPaymentRequest($data));
+	    $standardPaymentRequest = (new StandardPaymentRequest('', $data));
 
-        $response = $this->authenticatedHttpClient->post($standardPaymentRequest);
+	    $response = $this->authenticatedHttpClient->post($standardPaymentRequest);
 
-        $standardPaymentResponse = new StandardPaymentResponse($response);
+	    $standardPaymentResponse = new StandardPaymentResponse($response);
 
-        return $standardPaymentResponse->getResponse();
+	    return $standardPaymentResponse->getResponse();
     }
+
+	/**
+	 * @param string $transactionId
+	 * @return Transaction
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws ReflectionException
+	 */
+	public function verifyTransaction(string $transactionId): Transaction {
+		$verifyTransactionRequest = (new VerifyTransactionRequest($transactionId, $this->baseUrl . VerifyTransactionRequest::URI));
+
+		$response = $this->authenticatedHttpClient->get($verifyTransactionRequest);
+
+		$verifyTransactionResponse = new VerifyTransactionResponse($response);
+
+		return $verifyTransactionResponse->getTransaction();
+	}
 }

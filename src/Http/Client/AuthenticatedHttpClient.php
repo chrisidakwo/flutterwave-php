@@ -2,18 +2,18 @@
 
 namespace ChrisIdakwo\Flutterwave\Http\Client;
 
-use ChrisIdakwo\Flutterwave\Http\Request\HttpGetRequest;
-use ChrisIdakwo\Flutterwave\Http\Request\HttpPostRequest;
+use ChrisIdakwo\Flutterwave\Http\Request\Contracts\HttpGetRequest;
+use ChrisIdakwo\Flutterwave\Http\Request\Contracts\HttpPostRequest;
 
 class AuthenticatedHttpClient implements HttpClient {
-    /**
-     * Base http client without authentication.
-     */
-    private AnonymousHttpClient $http;
+	/**
+	 * Base http client without authentication.
+	 */
+	private AnonymousHttpClient $http;
 
-    /**
-     * Secret key provided by Flutterwave. Used to initialize http client headers.
-     */
+	/**
+	 * Secret key provided by Flutterwave. Used to initialize http client headers.
+	 */
     private string $token;
 
     public function __construct(AnonymousHttpClient $anonymousHttpClient, string $token) {
@@ -25,15 +25,21 @@ class AuthenticatedHttpClient implements HttpClient {
      * @inheritDoc
      */
     public function post(HttpPostRequest $request): string {
-        $requestBody = $request->getBody();
-        $headers = $this->getHeaders();
+	    $requestBody = $request->getBody();
+	    $headers = $this->getHeaders();
 
-        $response = $this->http->getHttpClient()->post($request->getUrl(), [
-            'body' => $requestBody,
-            'headers' => $headers
-        ]);
+	    if ($requestBody !== '') {
+		    $response = $this->http->getHttpClient()->post($request->getUrl(), [
+			    'body' => $requestBody,
+			    'headers' => $headers
+		    ]);
+	    } else {
+		    $response = $this->http->getHttpClient()->post($request->getUrl(), [
+			    'headers' => $headers
+		    ]);
+	    }
 
-        return $response->getBody();
+	    return $response->getBody();
     }
 
     /**

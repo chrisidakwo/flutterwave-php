@@ -2,27 +2,34 @@
 
 namespace ChrisIdakwo\Flutterwave\Http\Request;
 
-use JsonException;
+use ChrisIdakwo\Flutterwave\Http\Request\Contracts\HttpPostRequest as HttpPostRequestContract;
 
-interface HttpPostRequest {
-    /**
-     * Returns the URL for the POST request.
-     *
-     * @return string
-     */
-    public function getUrl(): string;
+abstract class HttpPostRequest implements HttpPostRequestContract {
+	public string $url;
+	protected ?array $data;
 
-    /**
-     * @param array|null $data
-     * @return self
-     */
-    public function setBody(array $data = []): self;
+	public function __construct(string $url, $data = []) {
+		$this->url = $url;
+		$this->setBody($data);
+	}
 
-    /**
-     * Returns the body (data) for the POST request.
-     *
-     * @return string
-     * @throws JsonException
-     */
-    public function getBody(): string;
+	/**
+	 * @inheritDoc
+	 */
+	public function setBody(array $data = []): self {
+		$this->data = $data;
+
+		return $this;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getBody(): string {
+		if (empty($this->data)) {
+			return '';
+		}
+
+		return json_encode($this->data, JSON_THROW_ON_ERROR);
+	}
 }

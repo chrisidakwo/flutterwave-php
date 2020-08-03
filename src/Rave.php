@@ -9,6 +9,9 @@ use ChrisIdakwo\Flutterwave\Http\Client\AuthenticatedHttpClient;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentRequest;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentResponse;
 use ChrisIdakwo\Flutterwave\Support\Validations\StandardPaymentValidator;
+use ChrisIdakwo\Flutterwave\Transaction\Refund\Refund;
+use ChrisIdakwo\Flutterwave\Transaction\Refund\TransactionRefundRequest;
+use ChrisIdakwo\Flutterwave\Transaction\Refund\TransactionRefundResponse;
 use ChrisIdakwo\Flutterwave\Transaction\Transaction;
 use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionRequest;
 use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionResponse;
@@ -76,5 +79,23 @@ class Rave {
 		$verifyTransactionResponse = new VerifyTransactionResponse($response);
 
 		return $verifyTransactionResponse->getTransaction();
+	}
+
+	/**
+	 * @param string $transactionId
+	 * @param array $data
+	 * @return Refund
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws ReflectionException
+	 */
+	public function refundTransaction(string $transactionId, array $data): Refund {
+		$refundTransactionRequest = (new TransactionRefundRequest($transactionId, $this->baseUrl . TransactionRefundRequest::URI, $data));
+
+		$response = $this->authenticatedHttpClient->post($refundTransactionRequest);
+
+		$refundTransactionResponse = new TransactionRefundResponse($response);
+
+		return $refundTransactionResponse->getRefund();
 	}
 }

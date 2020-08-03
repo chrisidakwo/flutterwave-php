@@ -3,8 +3,8 @@
 namespace ChrisIdakwo\Flutterwave\Validations;
 
 interface IValidator {
-	/**
-	 * @return self
-	 */
-	public function validate(): self;
+    /**
+     * @return self
+     */
+    public function validate(): self;
 }

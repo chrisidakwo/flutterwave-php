@@ -7,12 +7,12 @@ use ChrisIdakwo\Flutterwave\Http\Request\HttpPostRequest;
 
 class AuthenticatedHttpClient implements HttpClient {
     /**
-     * Base http client without authentication
+     * Base http client without authentication.
      */
     private AnonymousHttpClient $http;
 
     /**
-     * Secret key provided by Flutterwave. Used to initialize http client headers
+     * Secret key provided by Flutterwave. Used to initialize http client headers.
      */
     private string $token;
 
@@ -29,8 +29,8 @@ class AuthenticatedHttpClient implements HttpClient {
         $headers = $this->getHeaders();
 
         $response = $this->http->getHttpClient()->post($request->getUrl(), [
-        	'body' => $requestBody,
-	        'headers' => $headers
+            'body' => $requestBody,
+            'headers' => $headers
         ]);
 
         return $response->getBody();
@@ -42,7 +42,7 @@ class AuthenticatedHttpClient implements HttpClient {
     public function get(HttpGetRequest $request): string {
         $headers = $this->getHeaders();
         $response = $this->http->getHttpClient()->get($request->getUrl(), [
-        	'headers' => $headers
+            'headers' => $headers
         ]);
 
         return $response->getBody();
@@ -55,8 +55,8 @@ class AuthenticatedHttpClient implements HttpClient {
      */
     private function getHeaders(): array {
         return [
-        	'Accept' => 'application/json',
-        	'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
             'Authorization' => "Bearer $this->token"
         ];
     }

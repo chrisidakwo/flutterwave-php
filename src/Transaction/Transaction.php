@@ -2,7 +2,7 @@
 
 namespace ChrisIdakwo\Flutterwave\Transaction;
 
-use ChrisIdakwo\Flutterwave\Entity;
+use ChrisIdakwo\Flutterwave\Support\Entity;
 
 class Transaction extends Entity {
     public int $id;

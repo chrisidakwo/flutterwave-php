@@ -14,12 +14,13 @@ class TransactionRefundRequest extends HttpPostRequest {
      *
      * @param string $transactionId
      * @param string $url
-     * @param array $data
+     * @param int|float $amount
      */
-    public function __construct(string $transactionId, string $url, $data = []) {
-        parent::__construct($url, $data);
-
+    public function __construct(string $transactionId, string $url, $amount) {
         $this->transactionId = $transactionId;
+        $data = ['amount' => $amount];
+
+        parent::__construct($url, $data);
     }
 
     /**

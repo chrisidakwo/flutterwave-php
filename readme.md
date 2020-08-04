@@ -27,7 +27,12 @@ $transaction = $rave->verifyTransaction($transactionID);
 $amount = 34000;
 $customerEmail = 'customer@email.com';
 
-return $transaction->amount === $amount && $transaction->currency === 'NGN' && $transaction->customer->email === $customerEmail;
+$transaction->amount === $amount && $transaction->currency === 'NGN' && $transaction->customer->email === $customerEmail;
+
+// Refund a transaction
+$transactionID = '9408294';
+$amount = 300;
+$refund = $rave->refundTransaction($transactionID, $amount);
 ```
 
 

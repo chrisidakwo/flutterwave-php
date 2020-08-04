@@ -83,14 +83,14 @@ class Rave {
 
     /**
      * @param string $transactionId
-     * @param array $data
+     * @param int $amount
      * @return Refund
      * @throws GuzzleException
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function refundTransaction(string $transactionId, array $data): Refund {
-        $refundTransactionRequest = (new TransactionRefundRequest($transactionId, $this->baseUrl . TransactionRefundRequest::URI, $data));
+    public function refundTransaction(string $transactionId, int $amount): Refund {
+        $refundTransactionRequest = (new TransactionRefundRequest($transactionId, $this->baseUrl . TransactionRefundRequest::URI, $amount));
 
         $response = $this->authenticatedHttpClient->post($refundTransactionRequest);
 

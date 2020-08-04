@@ -14,10 +14,9 @@ class TransactionRefundTest extends TestCase {
      */
     public function testRefundIsSuccessful(): void {
         $transactionId = getenv('ACCOUNT_TRANSACTION');
-        $data = ['amount' => 100];
 
-        $refund = $this->rave->refundTransaction($transactionId, $data);
+        $refund = $this->rave->refundTransaction($transactionId, 100);
 
-        self::assertEquals($refund->amountRefunded, $data['amount']);
+        self::assertEquals($refund->amountRefunded, 100);
     }
 }

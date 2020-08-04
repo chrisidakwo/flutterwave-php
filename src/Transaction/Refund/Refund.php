@@ -2,7 +2,7 @@
 
 namespace ChrisIdakwo\Flutterwave\Transaction\Refund;
 
-use ChrisIdakwo\Flutterwave\Entity;
+use ChrisIdakwo\Flutterwave\Support\Entity;
 
 class Refund extends Entity {
     public int $id;

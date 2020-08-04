@@ -1,8 +1,7 @@
 <?php
 
-namespace ChrisIdakwo\Flutterwave;
+namespace ChrisIdakwo\Flutterwave\Support;
 
-use ChrisIdakwo\Flutterwave\Support\Str;
 use JsonException;
 use ReflectionClass;
 use ReflectionException;

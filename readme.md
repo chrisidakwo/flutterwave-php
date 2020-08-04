@@ -1,7 +1,6 @@
 # Flutterwave-PHP
 
 A PHP client for the Flutterwave payment processing system. This is intended for cases where the payment process is initiated from an API server but carried-out by a web application or SPA. 
-This library contains support for use with Laravel.
 
 ## Installation
 As expected:

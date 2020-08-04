@@ -34,15 +34,5 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "fix": "vendor/bin/php-cs-fixer fix"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "ChrisIdakwo\\Flutterwave\\Providers\\RaveServiceProvider"
-            ],
-            "aliases": {
-                "Rave": "ChrisIdakwo\\Flutterwave\\Facades\\RaveFacade"
-            }
-        }
     }
 }

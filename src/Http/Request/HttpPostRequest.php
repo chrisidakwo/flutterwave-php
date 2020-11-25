@@ -13,23 +13,32 @@ abstract class HttpPostRequest implements HttpPostRequestContract {
         $this->setBody($data);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setBody(array $data = []): self {
-        $this->data = $data;
+	/**
+	 * @inheritDoc
+	 */
+	public function setBody(array $data = []): self {
+		$this->data = $data;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @inheritDoc
-     */
-    public function getBody(): string {
-        if (empty($this->data)) {
-            return '';
-        }
+	/**
+	 * Returns the URL for the POST request.
+	 *
+	 * @return string
+	 */
+	public function getUrl(): string {
+		return $this->url;
+	}
 
-        return json_encode($this->data, JSON_THROW_ON_ERROR);
+	/**
+	 * @inheritDoc
+	 */
+	public function getBody(): string {
+		if (empty($this->data)) {
+			return '';
+		}
+
+		return json_encode($this->data, JSON_THROW_ON_ERROR);
     }
 }

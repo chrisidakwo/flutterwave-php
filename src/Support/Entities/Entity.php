@@ -1,17 +1,16 @@
 <?php
 
-namespace ChrisIdakwo\Flutterwave\Support;
+namespace ChrisIdakwo\Flutterwave\Support\Entities;
 
+use ChrisIdakwo\Flutterwave\Support\Str;
 use JsonException;
 use ReflectionClass;
-use ReflectionException;
 
 class Entity {
     /**
      * Entity constructor.
      *
      * @param array $properties
-     * @throws ReflectionException
      */
     public function __construct(array $properties) {
         $reflectionClass = new ReflectionClass($this);

@@ -7,12 +7,12 @@ use JsonException;
 use ReflectionException;
 
 class BankAccountChargeResponse extends HttpResponse {
-	/**
-	 * @return BankAccountCharge
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function getBankAccountCharge(): BankAccountCharge {
-		return new BankAccountCharge($this->getResponse()['data']);
-	}
+    /**
+     * @return BankAccountCharge
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function getBankAccountCharge(): BankAccountCharge {
+        return new BankAccountCharge($this->getResponse()['data']);
+    }
 }

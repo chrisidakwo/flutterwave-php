@@ -28,18 +28,15 @@ class AuthenticatedHttpClient implements HttpClient {
         $requestBody = $request->getBody();
         $headers = $this->getHeaders();
 
-        if ($requestBody !== '') {
-            $response = $this->http->getHttpClient()->post($request->getUrl(), [
-                'body' => $requestBody,
-                'headers' => $headers
-            ]);
+        if ($requestBody === '') {
+            $options = ['headers' => $headers];
         } else {
-            $response = $this->http->getHttpClient()->post($request->getUrl(), [
-                'headers' => $headers
-            ]);
+            $options = ['body' => $requestBody, 'headers' => $headers];
         }
 
-        return $response->getBody();
+        $response = $this->http->getHttpClient()->post($request->getUrl(), $options);
+
+        return (string)\GuzzleHttp\json_encode(\GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -51,7 +48,7 @@ class AuthenticatedHttpClient implements HttpClient {
             'headers' => $headers
         ]);
 
-        return $response->getBody();
+        return (string)\GuzzleHttp\json_encode(\GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_PRETTY_PRINT));
     }
 
     /**

@@ -8,12 +8,12 @@ use JsonException;
 use ReflectionException;
 
 class RefundPreAuthChargeResponse extends HttpResponse {
-	/**
-	 * @return Transaction
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function getTransaction(): Transaction {
-		return new Transaction($this->getResponse()['data']);
-	}
+    /**
+     * @return Transaction
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function getTransaction(): Transaction {
+        return new Transaction($this->getResponse()['data']);
+    }
 }

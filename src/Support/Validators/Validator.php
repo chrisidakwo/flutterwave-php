@@ -5,7 +5,7 @@ namespace ChrisIdakwo\Flutterwave\Support\Validators;
 use Respect\Validation\Exceptions\Exception;
 
 abstract class Validator implements IValidator {
-	public array $data;
+    public array $data;
 
 	private string $errors;
 

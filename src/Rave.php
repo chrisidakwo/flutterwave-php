@@ -166,6 +166,8 @@ class Rave {
 	}
 
 	/**
+	 * Transfer funds from merchant account to a customer's bank account.
+	 *
 	 * @param array $transactionData
 	 * @return Bank\BankTransfer\BankTransfer
 	 * @throws GuzzleException
@@ -187,7 +189,7 @@ class Rave {
 	}
 
 	/**
-	 * Charge a Nigerian bank account.
+	 * Charge a Nigerian bank account. Allow customers to pay using a bank account.
 	 *
 	 * @param array $transactionData
 	 * @return BankAccountCharge
@@ -320,7 +322,6 @@ class Rave {
 		$refundResponse = new RefundPreAuthChargeResponse($response);
 
 		return $refundResponse->getTransaction();
-
 	}
 
 	/**

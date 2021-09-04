@@ -216,8 +216,6 @@ class Rave {
 
         $response = $this->authenticatedHttpClient->post($bankAccountChargeRequest);
 
-        var_dump($response);
-
         $bankAccountChargeResponse = new BankAccountChargeResponse($response);
 
         return $bankAccountChargeResponse->getBankAccountCharge();

@@ -15,7 +15,6 @@ use ChrisIdakwo\Flutterwave\Card\CancelPreAuthCharge\CancelPreAuthRequest;
 use ChrisIdakwo\Flutterwave\Card\CancelPreAuthCharge\CancelPreAuthResponse;
 use ChrisIdakwo\Flutterwave\Card\CapturePreAuthCharge\ChargePreAuthCardRequest;
 use ChrisIdakwo\Flutterwave\Card\CapturePreAuthCharge\ChargePreAuthCardResponse;
-use ChrisIdakwo\Flutterwave\Card\ChargeCard\CardAuthorization;
 use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCard;
 use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCardRequest;
 use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCardResponse;

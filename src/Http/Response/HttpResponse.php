@@ -15,6 +15,6 @@ class HttpResponse implements HttpResponseContract {
      * @inheritDoc
      */
     public function getResponse(): array {
-        return (array) json_decode($this->response, true, 512, JSON_THROW_ON_ERROR);
+        return (array)\GuzzleHttp\json_decode($this->response, true, 512, JSON_THROW_ON_ERROR);
     }
 }

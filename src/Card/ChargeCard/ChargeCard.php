@@ -1,10 +1,13 @@
 <?php
 
-namespace ChrisIdakwo\Flutterwave\Bank\BankAccountCharge;
+namespace ChrisIdakwo\Flutterwave\Card\ChargeCard;
 
+use ChrisIdakwo\Flutterwave\Support\Entities\Card;
+use ChrisIdakwo\Flutterwave\Support\Entities\Customer;
 use ChrisIdakwo\Flutterwave\Support\Entities\Entity;
+use ChrisIdakwo\Flutterwave\Support\Entities\Meta;
 
-class BankAccountCharge extends Entity {
+class ChargeCard extends Entity {
     public string $id;
     public string $txRef;
     public string $flwRef;
@@ -13,6 +16,7 @@ class BankAccountCharge extends Entity {
     public string $chargedAmount;
     public string $appFee;
     public string $merchantFee;
+    public ?string $processorResponse;
     public string $authModel;
     public string $currency;
     public string $ip;
@@ -21,9 +25,10 @@ class BankAccountCharge extends Entity {
     public string $authUrl;
     public string $paymentType;
     public string $fraudStatus;
+    public string $chargeType;
     public string $createdAt;
     public string $accountId;
-    public object $customer;
-    public object $account;
-    public object $meta;
+    public Customer $customer;
+    public Card $card;
+    public Meta $meta;
 }

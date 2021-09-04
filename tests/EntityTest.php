@@ -2,7 +2,7 @@
 
 namespace ChrisIdakwo\Flutterwave\Tests;
 
-use ChrisIdakwo\Flutterwave\Entity;
+use ChrisIdakwo\Flutterwave\Support\Entities\Entity;
 
 class EntityTest extends TestCase {
     public function testEntityCanBeConvertedToArray() {

@@ -7,9 +7,9 @@ use Respect\Validation\Exceptions\Exception;
 abstract class Validator implements IValidator {
     public array $data;
 
-	private string $errors;
+    private string $errors;
 
-	private bool $valid;
+    private bool $valid;
 
     public \Respect\Validation\Validator $validator;
 

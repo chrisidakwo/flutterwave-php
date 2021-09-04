@@ -23,7 +23,7 @@ class AnonymousHttpClient implements HttpClient {
             'body' => $requestBody
         ]);
 
-        return $response->getBody();
+        return (string)\GuzzleHttp\json_encode(\GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -32,7 +32,7 @@ class AnonymousHttpClient implements HttpClient {
     public function get(HttpGetRequest $request): string {
         $response = $this->http->get($request->getUrl());
 
-        return $response->getBody();
+        return (string)\GuzzleHttp\json_encode(\GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_PRETTY_PRINT));
     }
 
     /**

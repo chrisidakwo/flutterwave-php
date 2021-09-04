@@ -15,6 +15,9 @@ use ChrisIdakwo\Flutterwave\Card\CancelPreAuthCharge\CancelPreAuthRequest;
 use ChrisIdakwo\Flutterwave\Card\CancelPreAuthCharge\CancelPreAuthResponse;
 use ChrisIdakwo\Flutterwave\Card\CapturePreAuthCharge\ChargePreAuthCardRequest;
 use ChrisIdakwo\Flutterwave\Card\CapturePreAuthCharge\ChargePreAuthCardResponse;
+use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCard;
+use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCardRequest;
+use ChrisIdakwo\Flutterwave\Card\ChargeCard\ChargeCardResponse;
 use ChrisIdakwo\Flutterwave\Card\ChargeCardToken\ChargeCardTokenRequest;
 use ChrisIdakwo\Flutterwave\Card\ChargeCardToken\ChargeCardTokenResponse;
 use ChrisIdakwo\Flutterwave\Card\RefundPreAuthCharge\RefundPreAuthChargeRequest;
@@ -25,14 +28,19 @@ use ChrisIdakwo\Flutterwave\Http\Client\AnonymousHttpClient;
 use ChrisIdakwo\Flutterwave\Http\Client\AuthenticatedHttpClient;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentRequest;
 use ChrisIdakwo\Flutterwave\StandardPayment\StandardPaymentResponse;
+use ChrisIdakwo\Flutterwave\Support\Entities\Authorization;
 use ChrisIdakwo\Flutterwave\Support\Validators\BankAccountChargeValidator;
 use ChrisIdakwo\Flutterwave\Support\Validators\BankTransferValidator;
 use ChrisIdakwo\Flutterwave\Support\Validators\ChargeCardTokenValidator;
+use ChrisIdakwo\Flutterwave\Support\Validators\ChargeCardValidator;
 use ChrisIdakwo\Flutterwave\Support\Validators\StandardPaymentValidator;
+use ChrisIdakwo\Flutterwave\Support\Validators\ValidateChargeValidator;
 use ChrisIdakwo\Flutterwave\Transaction\Refund\Refund;
 use ChrisIdakwo\Flutterwave\Transaction\Refund\TransactionRefundRequest;
 use ChrisIdakwo\Flutterwave\Transaction\Refund\TransactionRefundResponse;
 use ChrisIdakwo\Flutterwave\Transaction\Transaction;
+use ChrisIdakwo\Flutterwave\ValidateCharge\ValidateChargeRequest;
+use ChrisIdakwo\Flutterwave\ValidateCharge\ValidateChargeResponse;
 use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionRequest;
 use ChrisIdakwo\Flutterwave\VerifyTransaction\VerifyTransactionResponse;
 use GuzzleHttp\Client;
@@ -41,299 +49,355 @@ use JsonException;
 use ReflectionException;
 
 class Rave {
-	public string $baseUrl;
-	private AuthenticatedHttpClient $authenticatedHttpClient;
+    public string $baseUrl;
+    private AuthenticatedHttpClient $authenticatedHttpClient;
 
-	/**
-	 * Rave constructor.
-	 *
-	 * @param string $secretKey
-	 * @param string $baseUrl
-	 * @throws InvalidSecretKey
-	 */
-	public function __construct(string $secretKey, string $baseUrl) {
-		if (empty($secretKey)) {
-			throw new InvalidSecretKey('The secret key cannot be an empty string!');
-		}
+    /**
+     * Rave constructor.
+     *
+     * @param string $secretKey
+     * @param string $baseUrl
+     * @throws InvalidSecretKey
+     */
+    public function __construct(string $secretKey, string $baseUrl) {
+        if (empty($secretKey)) {
+            throw new InvalidSecretKey('The secret key cannot be an empty string!');
+        }
 
-		$anonymousHttpClient = new AnonymousHttpClient(new Client);
-		$this->authenticatedHttpClient = new AuthenticatedHttpClient($anonymousHttpClient, $secretKey);
+        $anonymousHttpClient = new AnonymousHttpClient(new Client);
+        $this->authenticatedHttpClient = new AuthenticatedHttpClient($anonymousHttpClient, $secretKey);
 
-		$this->baseUrl = $baseUrl;
-	}
+        $this->baseUrl = $baseUrl;
+    }
 
-	/**
-	 * Generate a standard payment link which displays a payment modal.
-	 *
-	 * @param array $data
-	 * @return array
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws InvalidRequestDataException
-	 */
-	public function standardPayment(array $data): array {
-		$this->validateRequestData(StandardPaymentValidator::class, $data);
+    /**
+     * Generate a standard payment link which displays a payment modal.
+     *
+     * @param array $data
+     * @return array
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws InvalidRequestDataException
+     */
+    public function standardPayment(array $data): array {
+        $this->validateRequestData(StandardPaymentValidator::class, $data);
 
-		$standardPaymentRequest = (new StandardPaymentRequest('', $data));
+        $standardPaymentRequest = (new StandardPaymentRequest('', $data));
 
-		$response = $this->authenticatedHttpClient->post($standardPaymentRequest);
+        $response = $this->authenticatedHttpClient->post($standardPaymentRequest);
 
-		$standardPaymentResponse = new StandardPaymentResponse($response);
+        $standardPaymentResponse = new StandardPaymentResponse($response);
 
-		return $standardPaymentResponse->getResponse();
-	}
+        return $standardPaymentResponse->getResponse();
+    }
 
-	/**
-	 * Verify the success status of a transaction based on the returned id.
-	 *
-	 * @param string $transactionId
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function verifyTransaction(string $transactionId): Transaction {
-		$verifyTransactionRequest = (new VerifyTransactionRequest($transactionId, $this->baseUrl . VerifyTransactionRequest::URI));
+    /**
+     * Verify the success status of a transaction based on the returned id.
+     *
+     * @param string $transactionId
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function verifyTransaction(string $transactionId): Transaction {
+        $verifyTransactionRequest = (new VerifyTransactionRequest($transactionId, $this->baseUrl . VerifyTransactionRequest::URI));
 
-		$response = $this->authenticatedHttpClient->get($verifyTransactionRequest);
+        $response = $this->authenticatedHttpClient->get($verifyTransactionRequest);
 
-		$verifyTransactionResponse = new VerifyTransactionResponse($response);
+        $verifyTransactionResponse = new VerifyTransactionResponse($response);
 
-		return $verifyTransactionResponse->getTransaction();
-	}
+        return $verifyTransactionResponse->getTransaction();
+    }
 
-	/**
-	 * Refund a transaction, identified by id returned from related successful transaction.
-	 *
-	 * @param string $transactionId
-	 * @param int $amount
-	 * @return Refund
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function refundTransaction(string $transactionId, int $amount): Refund {
-		$refundTransactionRequest = (new TransactionRefundRequest($transactionId, $this->baseUrl . TransactionRefundRequest::URI, $amount));
+    /**
+     * Refund a transaction, identified by id returned from related successful transaction.
+     *
+     * @param string $transactionId
+     * @param int $amount
+     * @return Refund
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function refundTransaction(string $transactionId, int $amount): Refund {
+        $url = $this->baseUrl . TransactionRefundRequest::URI;
 
-		$response = $this->authenticatedHttpClient->post($refundTransactionRequest);
+        $refundTransactionRequest = new TransactionRefundRequest($transactionId, $url, $amount);
 
-		$refundTransactionResponse = new TransactionRefundResponse($response);
+        $response = $this->authenticatedHttpClient->post($refundTransactionRequest);
 
-		return $refundTransactionResponse->getRefund();
-	}
+        $refundTransactionResponse = new TransactionRefundResponse($response);
 
-	/**
-	 * Verify a given Bank Verification Number.
-	 *
-	 * @param string $bvn
-	 * @return BVN\BVNVerification
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function verifyBVN(string $bvn): BVN\BVNVerification {
-		$bvnRequest = (new BVNVerificationRequest($bvn, $this->baseUrl . BVNVerificationRequest::URI));
+        return $refundTransactionResponse->getRefund();
+    }
 
-		$response = $this->authenticatedHttpClient->get($bvnRequest);
+    /**
+     * Verify a given Bank Verification Number.
+     *
+     * @param string $bvn
+     * @return BVN\BVNVerification
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function verifyBVN(string $bvn): BVN\BVNVerification {
+        $bvnRequest = (new BVNVerificationRequest($bvn, $this->baseUrl . BVNVerificationRequest::URI));
 
-		$bvnResponse = new BVNVerificationResponse($response);
+        $response = $this->authenticatedHttpClient->get($bvnRequest);
 
-		return $bvnResponse->getBVNVerification();
-	}
+        $bvnResponse = new BVNVerificationResponse($response);
 
-	/**
-	 * Verify a Nigerian bank account.
-	 *
-	 * @param string $bankCode
-	 * @param string $accountNumber
-	 * @return array
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function verifyBankAccount(string $bankCode, string $accountNumber): array {
-		$url = $this->baseUrl . BankAccountVerificationRequest::URI;
+        return $bvnResponse->getBVNVerification();
+    }
 
-		$bankVerificationRequest = (new BankAccountVerificationRequest($url, [
-			'account_number' => $accountNumber,
-			'account_bank' => $bankCode
-		]));
+    /**
+     * Verify a Nigerian bank account.
+     *
+     * @param string $bankCode
+     * @param string $accountNumber
+     * @return array
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function verifyBankAccount(string $bankCode, string $accountNumber): array {
+        $url = $this->baseUrl . BankAccountVerificationRequest::URI;
 
-		$response = $this->authenticatedHttpClient->post($bankVerificationRequest);
+        $bankVerificationRequest = (new BankAccountVerificationRequest($url, [
+            'account_number' => $accountNumber,
+            'account_bank' => $bankCode
+        ]));
 
-		$bankVerificationResponse = new BankAccountVerificationResponse($response);
+        $response = $this->authenticatedHttpClient->post($bankVerificationRequest);
 
-		return $bankVerificationResponse->getResponse();
-	}
+        $bankVerificationResponse = new BankAccountVerificationResponse($response);
 
-	/**
-	 * Transfer funds from merchant account to a customer's bank account.
-	 *
-	 * @param array $transactionData
-	 * @return Bank\BankTransfer\BankTransfer
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function bankTransfer(array $transactionData): Bank\BankTransfer\BankTransfer {
-		$this->validateRequestData(BankTransferValidator::class, $transactionData);
+        return $bankVerificationResponse->getResponse();
+    }
 
-		$url = $this->baseUrl . BankTransferRequest::URI;
+    /**
+     * Transfer funds from merchant account to a customer's bank account.
+     *
+     * @param array $transactionData
+     * @return Bank\BankTransfer\BankTransfer
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function bankTransfer(array $transactionData): Bank\BankTransfer\BankTransfer {
+        $this->validateRequestData(BankTransferValidator::class, $transactionData);
 
-		$bankTransferRequest = new BankTransferRequest($url, $transactionData);
+        $url = $this->baseUrl . BankTransferRequest::URI;
 
-		$response = $this->authenticatedHttpClient->post($bankTransferRequest);
+        $bankTransferRequest = new BankTransferRequest($url, $transactionData);
 
-		$bankTransferResponse = new BankTransferResponse($response);
+        $response = $this->authenticatedHttpClient->post($bankTransferRequest);
 
-		return $bankTransferResponse->getBankTransfer();
-	}
+        $bankTransferResponse = new BankTransferResponse($response);
 
-	/**
-	 * Charge a Nigerian bank account. Allow customers to pay using a bank account.
-	 *
-	 * @param array $transactionData
-	 * @return BankAccountCharge
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function chargeBankAccount(array $transactionData): BankAccountCharge {
-		$this->validateRequestData(BankAccountChargeValidator::class, $transactionData);
+        return $bankTransferResponse->getBankTransfer();
+    }
 
-		$url = $this->baseUrl . BankAccountChargeRequest::URI;
+    /**
+     * Charge a Nigerian bank account. Allow customers to pay using a bank account.
+     *
+     * @param array $transactionData
+     * @return BankAccountCharge
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function chargeBankAccount(array $transactionData): BankAccountCharge {
+        $this->validateRequestData(BankAccountChargeValidator::class, $transactionData);
 
-		$bankAccountChargeRequest = new BankAccountChargeRequest($url, $transactionData);
+        $url = $this->baseUrl . BankAccountChargeRequest::URI;
 
-		$response = $this->authenticatedHttpClient->post($bankAccountChargeRequest);
+        $bankAccountChargeRequest = new BankAccountChargeRequest($url, $transactionData);
 
-		$bankAccountChargeResponse = new BankAccountChargeResponse($response);
+        $response = $this->authenticatedHttpClient->post($bankAccountChargeRequest);
 
-		return $bankAccountChargeResponse->getBankAccountCharge();
-	}
+        var_dump($response);
 
-	/**
-	 * Charge a card using a previously saved token.
-	 *
-	 * @param string $cardToken
-	 * @param array $chargeData
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function chargeCardToken(string $cardToken, array $chargeData): Transaction {
-		$this->validateRequestData(ChargeCardTokenValidator::class, $chargeData);
+        $bankAccountChargeResponse = new BankAccountChargeResponse($response);
 
-		$url = $this->baseUrl . ChargeCardTokenRequest::URI;
+        return $bankAccountChargeResponse->getBankAccountCharge();
+    }
 
-		$chargeCardTokenRequest = new ChargeCardTokenRequest($url, array_merge([
-			'token' => $cardToken
-		], $chargeData));
+    /**
+     * @param array $transactionData
+     * @return array|ChargeCard|Authorization
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function chargeCard(array $transactionData) {
+        $this->validateRequestData(ChargeCardValidator::class, $transactionData);
 
-		$response = $this->authenticatedHttpClient->post($chargeCardTokenRequest);
+        $encryptedData = [
+            'client' => encryptTransactionData(array_merge($transactionData, [
+                'preauthorize' => false
+            ]), getenv('ENCRYPTION_KEY'))
+        ];
 
-		$chargeCardTokenResponse = new ChargeCardTokenResponse($response);
+        $url = $this->baseUrl . ChargeCardRequest::URI;
+        $bankAccountChargeRequest = new ChargeCardRequest($url, $encryptedData);
 
-		return $chargeCardTokenResponse->getTransaction();
-	}
+        $response = $this->authenticatedHttpClient->post($bankAccountChargeRequest);
 
-	/**
-	 * Use a card token to preauthorize a charge on a given card.
-	 *
-	 * @param string $cardToken
-	 * @param array $chargeData
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function preAuthCardWithToken(string $cardToken, array $chargeData): Transaction {
-		$chargeData = array_merge($chargeData, [
-			'preauthorize' => true
-		]);
+        $chargeCardResponse = new ChargeCardResponse($response);
 
-		return $this->chargeCardToken($cardToken, $chargeData);
-	}
+        return $chargeCardResponse->getChargeCard();
+    }
 
-	/**
-	 * Collect preauthorized funds on a given card.
-	 *
-	 * @param string $flwRef
-	 * @param string $amount
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function capturePreAuthCharge(string $flwRef, string $amount): Transaction {
-		$requestData = [
-			'amount' => $amount
-		];
+    /**
+     * @param string $transactionReference
+     * @param string $otp
+     * @param string $type
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function validateCharge(string $transactionReference, string $otp, string $type): Transaction {
+        $data = [
+            'flw_ref' => $transactionReference,
+            'otp' => $otp,
+            'type' => $type
+        ];
 
-		$url = $this->baseUrl . ChargePreAuthCardRequest::URI;
+        $this->validateRequestData(ValidateChargeValidator::class, $data);
 
-		$preAuthRequest = new ChargePreAuthCardRequest($flwRef, $url, $requestData);
+        $url = $this->baseUrl = ValidateChargeRequest::URI;
+        $validateChargeRequest = new ValidateChargeRequest($url, $data);
 
-		$response = $this->authenticatedHttpClient->post($preAuthRequest);
+        $response = $this->authenticatedHttpClient->post($validateChargeRequest);
 
-		$preAuthResponse = new ChargePreAuthCardResponse($response);
+        $validateChargeResponse = new ValidateChargeResponse($response);
 
-		return $preAuthResponse->getTransaction();
-	}
+        return $validateChargeResponse->getValidatedCharge();
+    }
 
-	/**
-	 * Cancel or release the hold on a preauthorized charge.
-	 *
-	 * @param string $flwRef
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function cancelPreAuthCard(string $flwRef): Transaction {
-		$url = $this->baseUrl . CancelPreAuthRequest::URI;
+    /**
+     * Charge a card using a previously saved token.
+     *
+     * @param string $cardToken
+     * @param array $chargeData
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function chargeCardToken(string $cardToken, array $chargeData): Transaction {
+        $this->validateRequestData(ChargeCardTokenValidator::class, $chargeData);
 
-		$cancelRequest = new CancelPreAuthRequest($flwRef, $url);
+        $url = $this->baseUrl . ChargeCardTokenRequest::URI;
 
-		$response = $this->authenticatedHttpClient->post($cancelRequest);
+        $chargeCardTokenRequest = new ChargeCardTokenRequest($url, array_merge([
+            'token' => $cardToken
+        ], $chargeData));
 
-		$cancelResponse = new CancelPreAuthResponse($response);
+        $response = $this->authenticatedHttpClient->post($chargeCardTokenRequest);
 
-		return $cancelResponse->getTransaction();
-	}
+        $chargeCardTokenResponse = new ChargeCardTokenResponse($response);
 
-	/**
-	 * Return a captured amount from a previously preauthorized charge.
-	 *
-	 * @param string $flwRef
-	 * @param string $amount
-	 * @return Transaction
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 * @throws ReflectionException
-	 */
-	public function refundPreAuthCharge(string $flwRef, string $amount): Transaction {
-		$url = $this->baseUrl . RefundPreAuthChargeRequest::URI;
+        return $chargeCardTokenResponse->getTransaction();
+    }
 
-		$refundRequest = new RefundPreAuthChargeRequest($url, $flwRef, $amount);
+    /**
+     * Use a card token to preauthorize a charge on a given card.
+     *
+     * @param string $cardToken
+     * @param array $chargeData
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function preAuthCardWithToken(string $cardToken, array $chargeData): Transaction {
+        $chargeData = array_merge($chargeData, [
+            'preauthorize' => true
+        ]);
 
-		$response = $this->authenticatedHttpClient->post($refundRequest);
+        return $this->chargeCardToken($cardToken, $chargeData);
+    }
 
-		$refundResponse = new RefundPreAuthChargeResponse($response);
+    /**
+     * Collect preauthorized funds on a given card.
+     *
+     * @param string $flwRef
+     * @param string $amount
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function capturePreAuthCharge(string $flwRef, string $amount): Transaction {
+        $requestData = [
+            'amount' => $amount
+        ];
 
-		return $refundResponse->getTransaction();
-	}
+        $url = $this->baseUrl . ChargePreAuthCardRequest::URI;
 
-	/**
-	 * Validate request data based on a provided validator class.
-	 *
-	 * @param string $validator
-	 * @param array $requestData
-	 */
-	private function validateRequestData(string $validator, array $requestData): void {
-		$validatorInstance = (new $validator($requestData))->validate();
-		if (!$validatorInstance->isValid()) {
-			throw new InvalidRequestDataException($validatorInstance->getErrors());
-		}
-	}
+        $preAuthRequest = new ChargePreAuthCardRequest($flwRef, $url, $requestData);
+
+        $response = $this->authenticatedHttpClient->post($preAuthRequest);
+
+        $preAuthResponse = new ChargePreAuthCardResponse($response);
+
+        return $preAuthResponse->getTransaction();
+    }
+
+    /**
+     * Cancel or release the hold on a preauthorized charge.
+     *
+     * @param string $flwRef
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function cancelPreAuthCard(string $flwRef): Transaction {
+        $url = $this->baseUrl . CancelPreAuthRequest::URI;
+
+        $cancelRequest = new CancelPreAuthRequest($flwRef, $url);
+
+        $response = $this->authenticatedHttpClient->post($cancelRequest);
+
+        $cancelResponse = new CancelPreAuthResponse($response);
+
+        return $cancelResponse->getTransaction();
+    }
+
+    /**
+     * Return a captured amount from a previously preauthorized charge.
+     *
+     * @param string $flwRef
+     * @param string $amount
+     * @return Transaction
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    public function refundPreAuthCharge(string $flwRef, string $amount): Transaction {
+        $url = $this->baseUrl . RefundPreAuthChargeRequest::URI;
+
+        $refundRequest = new RefundPreAuthChargeRequest($url, $flwRef, $amount);
+
+        $response = $this->authenticatedHttpClient->post($refundRequest);
+
+        $refundResponse = new RefundPreAuthChargeResponse($response);
+
+        return $refundResponse->getTransaction();
+    }
+
+    /**
+     * Validate request data based on a provided validator class.
+     *
+     * @param string $validator
+     * @param array $requestData
+     */
+    private function validateRequestData(string $validator, array $requestData): void {
+        $validatorInstance = (new $validator($requestData))->validate();
+        if (!$validatorInstance->isValid()) {
+            throw new InvalidRequestDataException($validatorInstance->getErrors());
+        }
+    }
 }

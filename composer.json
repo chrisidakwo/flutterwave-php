@@ -14,7 +14,7 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "5.*|6.*|7.*",
-        "vlucas/phpdotenv": "^2.2|^3.6|^4.0",
+        "vlucas/phpdotenv": "^2.2|^3.6|^4.0|^5.0",
         "respect/validation": "^2.0"
     },
     "require-dev": {

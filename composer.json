@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4 | >=8.0",
         "ext-json": "*",
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "5.*|6.*|7.*",
@@ -19,9 +19,9 @@
     },
     "require-dev": {
         "ext-xdebug": "*",
-        "phpunit/phpunit": "4.*",
         "mockery/mockery": "^0.9.4",
-        "friendsofphp/php-cs-fixer": "^2.16"
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {

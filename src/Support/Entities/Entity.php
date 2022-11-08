@@ -19,6 +19,7 @@ class Entity {
         foreach ($classProperties as $classProperty) {
             $value = $properties[Str::toSnakeCase($classProperty->getName())] ?? null;
 
+            // Should have used this: https://stackoverflow.com/a/1869569/2484914
             if (is_array($value)) {
                 $value = (object) $value;
             }
